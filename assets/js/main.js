@@ -370,7 +370,7 @@
   }
 
   /* ---------------------------------------------------------
-     Galeria de ambientes (masonry)
+     Galeria de ambientes (carrossel interativo)
   --------------------------------------------------------- */
   var siteGallery = [
     { src: "assets/img/gallery/ambiente-01-piscina", alt: "Sauna e área de lazer com piscina integrada, projeto Hidrolar Banhos" },
@@ -382,45 +382,167 @@
   ];
 
   function renderGallery() {
-    var grid = document.getElementById("gallery-grid");
-    if (!grid) return;
-    grid.innerHTML = siteGallery
+    var track = document.getElementById("gallery-track");
+    var dotsWrap = document.getElementById("gallery-dots");
+    var prevBtn = document.getElementById("gallery-prev");
+    var nextBtn = document.getElementById("gallery-next");
+    if (!track) return;
+
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    track.innerHTML = siteGallery
       .map(function (img, i) {
         return (
-          '<figure class="masonry-item reveal" data-gallery-index="' + i + '">' +
-          picture(img.src, img.alt, "", "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw") +
+          '<figure class="carousel-slide" data-gallery-index="' + i + '">' +
+          picture(img.src, img.alt, "", "(min-width: 1200px) 360px, (min-width: 768px) 34vw, 72vw") +
           "</figure>"
         );
       })
       .join("");
 
-    grid.querySelectorAll(".masonry-item").forEach(function (fig) {
+    var slides = Array.prototype.slice.call(track.querySelectorAll(".carousel-slide"));
+    track.scrollLeft = 0;
+
+    slides.forEach(function (fig) {
       fig.addEventListener("click", function () {
+        if (track.dataset.dragged === "true") return;
         var idx = parseInt(fig.getAttribute("data-gallery-index"), 10);
         openLightbox(siteGallery, idx);
       });
     });
 
-    if ("IntersectionObserver" in window) {
-      var io4 = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-visible");
-              io4.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.1 }
-      );
-      grid.querySelectorAll(".reveal").forEach(function (el) {
-        io4.observe(el);
+    // Dots
+    if (dotsWrap) {
+      dotsWrap.innerHTML = slides
+        .map(function (_, i) {
+          return '<button type="button" class="carousel-dot" data-dot-index="' + i + '" aria-label="Ir para o ambiente ' + (i + 1) + '"></button>';
+        })
+        .join("");
+    }
+    var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.querySelectorAll(".carousel-dot")) : [];
+
+    function slideLeft(slide) {
+      return slide.getBoundingClientRect().left - track.getBoundingClientRect().left + track.scrollLeft;
+    }
+
+    function currentIndex() {
+      var pos = track.scrollLeft;
+      var closest = 0;
+      var closestDist = Infinity;
+      slides.forEach(function (slide, i) {
+        var dist = Math.abs(slideLeft(slide) - pos);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closest = i;
+        }
       });
-    } else {
-      grid.querySelectorAll(".reveal").forEach(function (el) {
-        el.classList.add("is-visible");
+      return closest;
+    }
+
+    var requestedIndex = 0;
+
+    function scrollToIndex(index) {
+      requestedIndex = Math.max(0, Math.min(slides.length - 1, index));
+      track.scrollTo({ left: slideLeft(slides[requestedIndex]), behavior: reduceMotion ? "auto" : "smooth" });
+    }
+
+    function updateActiveState() {
+      var index = currentIndex();
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle("is-active", i === index);
+      });
+      if (prevBtn) prevBtn.classList.toggle("is-disabled", track.scrollLeft <= 4);
+      if (nextBtn) {
+        var atEnd = track.scrollLeft >= track.scrollWidth - track.clientWidth - 4;
+        nextBtn.classList.toggle("is-disabled", atEnd);
+      }
+    }
+
+    dots.forEach(function (dot, i) {
+      dot.addEventListener("click", function () {
+        scrollToIndex(i);
+      });
+    });
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", function () {
+        scrollToIndex(requestedIndex - 1);
       });
     }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", function () {
+        scrollToIndex(requestedIndex + 1);
+      });
+    }
+
+    // Arraste com mouse (touch já rola nativamente)
+    var isDown = false;
+    var startX = 0;
+    var startScroll = 0;
+    var moved = false;
+
+    track.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "touch") return;
+      isDown = true;
+      moved = false;
+      track.dataset.dragged = "false";
+      startX = e.clientX;
+      startScroll = track.scrollLeft;
+      track.classList.add("is-dragging");
+      track.setPointerCapture(e.pointerId);
+    });
+
+    track.addEventListener("pointermove", function (e) {
+      if (!isDown) return;
+      var dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) {
+        moved = true;
+        track.dataset.dragged = "true";
+      }
+      track.scrollLeft = startScroll - dx;
+    });
+
+    function endDrag() {
+      if (!isDown) return;
+      isDown = false;
+      track.classList.remove("is-dragging");
+      if (moved) {
+        scrollToIndex(currentIndex());
+      }
+      setTimeout(function () {
+        track.dataset.dragged = "false";
+      }, 0);
+    }
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointerleave", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+
+    // Teclado (quando o track está focado)
+    track.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        scrollToIndex(currentIndex() + 1);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        scrollToIndex(currentIndex() - 1);
+      }
+    });
+
+    var scrollRaf = null;
+    track.addEventListener(
+      "scroll",
+      function () {
+        if (scrollRaf) return;
+        scrollRaf = requestAnimationFrame(function () {
+          updateActiveState();
+          scrollRaf = null;
+        });
+      },
+      { passive: true }
+    );
+
+    updateActiveState();
+    requestAnimationFrame(updateActiveState);
   }
 
   /* ---------------------------------------------------------
