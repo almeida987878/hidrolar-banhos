@@ -631,10 +631,26 @@ p {
    CATALOG / PRODUCT CARDS
    ========================================================= */
 
-.catalog-grid {
-  display: grid;
-  gap: var(--space-6);
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+.catalog-track {
+  align-items: stretch;
+}
+
+.catalog-track .product-card {
+  flex: 0 0 auto;
+  width: min(360px, 82vw);
+  scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+  .catalog-track .product-card {
+    width: min(400px, 42vw);
+  }
+}
+
+@media (min-width: 1200px) {
+  .catalog-track .product-card {
+    width: 420px;
+  }
 }
 
 .product-card {

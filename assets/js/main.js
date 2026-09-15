@@ -124,13 +124,13 @@
   });
 
   /* ---------------------------------------------------------
-     Catálogo — renderiza cards a partir de PRODUCTS
+     Catálogo — carrossel de cards a partir de PRODUCTS
   --------------------------------------------------------- */
-  var catalogGrid = document.getElementById("catalog-grid");
-
   function renderCatalog() {
-    if (!catalogGrid) return;
-    catalogGrid.innerHTML = PRODUCTS.map(function (product) {
+    var track = document.getElementById("catalog-track");
+    if (!track) return;
+
+    track.innerHTML = PRODUCTS.map(function (product) {
       var cover = product.images[0];
       var cashLabel = money(product.pricing.cash);
       return (
@@ -159,52 +159,20 @@
     }).join("");
 
     // reativa whatsapp links recém-criados
-    catalogGrid.querySelectorAll("[data-whatsapp]").forEach(function (el) {
+    track.querySelectorAll("[data-whatsapp]").forEach(function (el) {
       var customMessage = el.getAttribute("data-whatsapp-message");
       el.setAttribute("href", buildWhatsAppLink(customMessage));
       el.setAttribute("target", "_blank");
       el.setAttribute("rel", "noopener");
     });
 
-    revealCatalogGrid();
-  }
-
-  /* Entrada em onda dos cards do catálogo (GSAP, grid-aware, spring easing).
-     Cai para o estado final direto sem animação com reduced-motion ou sem GSAP. */
-  function revealCatalogGrid() {
-    var cards = catalogGrid.querySelectorAll(".product-card");
-    if (!cards.length) return;
-
-    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var hasGsap = typeof gsap !== "undefined";
-
-    if (!hasGsap || reduceMotion) {
-      return;
-    }
-
-    gsap.set(cards, { opacity: 0, y: 16, scale: 0.92 });
-
-    var played = false;
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting && !played) {
-            played = true;
-            gsap.to(cards, {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.4,
-              ease: "back.out(1.4)",
-              stagger: { each: 0.06, from: "start", grid: "auto" }
-            });
-            io.disconnect();
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    io.observe(catalogGrid);
+    initCarousel({
+      track: track,
+      prevBtn: document.getElementById("catalog-prev"),
+      nextBtn: document.getElementById("catalog-next"),
+      dotsWrap: document.getElementById("catalog-dots"),
+      dotLabel: function (i) { return "Ir para o projeto " + (i + 1); }
+    });
   }
 
   /* ---------------------------------------------------------
@@ -381,41 +349,27 @@
     { src: "assets/img/product/monaco-05", alt: "Sauna a Vapor Dupla Mônaco instalada em área externa" }
   ];
 
-  function renderGallery() {
-    var track = document.getElementById("gallery-track");
-    var dotsWrap = document.getElementById("gallery-dots");
-    var prevBtn = document.getElementById("gallery-prev");
-    var nextBtn = document.getElementById("gallery-next");
+  /* Carrossel genérico: arraste com mouse, swipe nativo no touch,
+     setas, dots e teclado. Usado pelo catálogo e pela galeria. */
+  function initCarousel(config) {
+    var track = config.track;
+    var prevBtn = config.prevBtn;
+    var nextBtn = config.nextBtn;
+    var dotsWrap = config.dotsWrap;
+    var dotLabel = config.dotLabel || function (i) { return "Ir para o item " + (i + 1); };
     if (!track) return;
 
+    var slides = Array.prototype.slice.call(track.children);
+    if (!slides.length) return;
+
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    track.innerHTML = siteGallery
-      .map(function (img, i) {
-        return (
-          '<figure class="carousel-slide" data-gallery-index="' + i + '">' +
-          picture(img.src, img.alt, "", "(min-width: 1200px) 360px, (min-width: 768px) 34vw, 72vw") +
-          "</figure>"
-        );
-      })
-      .join("");
-
-    var slides = Array.prototype.slice.call(track.querySelectorAll(".carousel-slide"));
     track.scrollLeft = 0;
 
-    slides.forEach(function (fig) {
-      fig.addEventListener("click", function () {
-        if (track.dataset.dragged === "true") return;
-        var idx = parseInt(fig.getAttribute("data-gallery-index"), 10);
-        openLightbox(siteGallery, idx);
-      });
-    });
-
-    // Dots
     if (dotsWrap) {
+      dotsWrap.hidden = slides.length <= 1;
       dotsWrap.innerHTML = slides
         .map(function (_, i) {
-          return '<button type="button" class="carousel-dot" data-dot-index="' + i + '" aria-label="Ir para o ambiente ' + (i + 1) + '"></button>';
+          return '<button type="button" class="carousel-dot" data-dot-index="' + i + '" aria-label="' + dotLabel(i) + '"></button>';
         })
         .join("");
     }
@@ -543,6 +497,37 @@
 
     updateActiveState();
     requestAnimationFrame(updateActiveState);
+  }
+
+  function renderGallery() {
+    var track = document.getElementById("gallery-track");
+    if (!track) return;
+
+    track.innerHTML = siteGallery
+      .map(function (img, i) {
+        return (
+          '<figure class="carousel-slide" data-gallery-index="' + i + '">' +
+          picture(img.src, img.alt, "", "(min-width: 1200px) 360px, (min-width: 768px) 34vw, 72vw") +
+          "</figure>"
+        );
+      })
+      .join("");
+
+    track.querySelectorAll(".carousel-slide").forEach(function (fig) {
+      fig.addEventListener("click", function () {
+        if (track.dataset.dragged === "true") return;
+        var idx = parseInt(fig.getAttribute("data-gallery-index"), 10);
+        openLightbox(siteGallery, idx);
+      });
+    });
+
+    initCarousel({
+      track: track,
+      prevBtn: document.getElementById("gallery-prev"),
+      nextBtn: document.getElementById("gallery-next"),
+      dotsWrap: document.getElementById("gallery-dots"),
+      dotLabel: function (i) { return "Ir para o ambiente " + (i + 1); }
+    });
   }
 
   /* ---------------------------------------------------------

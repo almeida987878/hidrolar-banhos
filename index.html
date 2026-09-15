@@ -159,7 +159,18 @@
       <p class="section-subtitle">Soluções desenvolvidas para transformar áreas de lazer, residências e espaços comerciais.</p>
     </div>
 
-    <div class="catalog-grid" id="catalog-grid"></div>
+    <div class="carousel" id="catalog-carousel">
+      <div class="carousel-track catalog-track" id="catalog-track" tabindex="0" role="region" aria-label="Carrossel de projetos"></div>
+
+      <button type="button" class="carousel-arrow carousel-prev" id="catalog-prev" aria-label="Projeto anterior">
+        <svg class="icon" aria-hidden="true"><use href="#icon-chevron-left"></use></svg>
+      </button>
+      <button type="button" class="carousel-arrow carousel-next" id="catalog-next" aria-label="Próximo projeto">
+        <svg class="icon" aria-hidden="true"><use href="#icon-chevron-right"></use></svg>
+      </button>
+    </div>
+
+    <div class="carousel-dots" id="catalog-dots"></div>
   </div>
 </section>
 
@@ -417,7 +428,6 @@
   </figure>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="assets/js/config.js"></script>
 <script src="assets/js/products.js"></script>
 <script src="assets/js/main.js"></script>
