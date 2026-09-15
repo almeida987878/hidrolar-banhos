@@ -37,6 +37,21 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  /* Esconde o WhatsApp flutuante enquanto o Hero (com CTAs próprios) está visível */
+  var whatsappFloat = document.querySelector(".whatsapp-float");
+  var heroSection = document.getElementById("topo");
+  if (whatsappFloat && heroSection && "IntersectionObserver" in window) {
+    var heroIO = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          whatsappFloat.classList.toggle("is-hidden", entry.isIntersecting);
+        });
+      },
+      { threshold: 0.35 }
+    );
+    heroIO.observe(heroSection);
+  }
+
   if (navToggle) {
     navToggle.addEventListener("click", function () {
       var isOpen = body.classList.toggle("nav-open");

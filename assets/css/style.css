@@ -509,42 +509,70 @@ p {
 
 .hero {
   position: relative;
-  padding-block: clamp(2.5rem, 6vw, 5rem);
-  background: var(--color-bg-soft);
-  overflow: hidden;
-}
-
-.hero::before {
-  content: "";
-  position: absolute;
-  top: -120px;
-  right: -120px;
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, rgba(41, 175, 230, 0.22) 0%, rgba(41, 175, 230, 0) 70%);
-  pointer-events: none;
-}
-
-.hero-grid {
-  display: grid;
-  gap: var(--space-8);
+  display: flex;
   align-items: center;
+  min-height: clamp(560px, 92vh, 880px);
+  padding-block: clamp(3rem, 8vw, 6rem);
+  background: var(--color-navy);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+@media (max-width: 480px) {
+  .hero {
+    min-height: 0;
+    padding-block: 6.5rem 4.5rem;
+  }
+}
+
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-video-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(7, 21, 50, 0.86) 0%,
+    rgba(7, 21, 50, 0.62) 42%,
+    rgba(7, 21, 50, 0.22) 75%
+  ),
+  linear-gradient(0deg, rgba(5, 15, 38, 0.55) 0%, rgba(5, 15, 38, 0) 32%);
+}
+
+.hero-content-wrap {
   position: relative;
+  z-index: 1;
+  width: 100%;
 }
 
 .hero-content {
-  position: relative;
-  z-index: 1;
+  max-width: 640px;
+}
+
+.hero .eyebrow {
+  color: var(--color-primary);
 }
 
 .hero-title {
+  color: var(--color-white);
   font-size: clamp(2.25rem, 1.6rem + 3.2vw, 4.5rem);
   margin-bottom: var(--space-5);
 }
 
 .hero-subtitle {
   font-size: clamp(1.05rem, 1rem + 0.4vw, 1.25rem);
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.82);
   max-width: 46ch;
   margin-bottom: var(--space-7);
 }
@@ -569,7 +597,7 @@ p {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.875rem;
-  color: var(--color-navy);
+  color: var(--color-white);
 }
 
 .trust-item .icon {
@@ -578,38 +606,24 @@ p {
   flex-shrink: 0;
 }
 
-.hero-media {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-medium);
-  aspect-ratio: 4 / 5;
-}
-
-.hero-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .hero-media-caption {
   position: absolute;
-  left: var(--space-5);
-  right: var(--space-5);
+  z-index: 1;
+  left: var(--side-padding);
   bottom: var(--space-5);
-  background: rgba(7, 29, 74, 0.72);
+  background: rgba(7, 29, 74, 0.55);
   backdrop-filter: blur(8px);
   color: var(--color-white);
-  padding: var(--space-4) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  padding: var(--space-3) var(--space-5);
+  border-radius: 999px;
+  font-size: 0.8rem;
   font-family: var(--font-display);
   font-weight: 600;
 }
 
-@media (min-width: 960px) {
-  .hero-grid {
-    grid-template-columns: 1.05fr 0.95fr;
+@media (max-width: 640px) {
+  .hero-media-caption {
+    display: none;
   }
 }
 
@@ -1348,7 +1362,18 @@ p {
   align-items: center;
   justify-content: center;
   box-shadow: 0 12px 30px rgba(41, 175, 230, 0.4);
-  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+    opacity var(--dur-base) var(--ease);
+}
+
+/* Escondido enquanto o Hero (que já tem seus próprios CTAs) está visível,
+   para não competir/sobrepor o conteúdo do vídeo em telas baixas. */
+.whatsapp-float.is-hidden {
+  opacity: 0;
+  transform: translateY(12px) scale(0.9);
+  pointer-events: none;
 }
 
 .whatsapp-float .icon {
@@ -1443,18 +1468,11 @@ p {
 }
 
 /* Vídeo do Hero */
-.hero-media video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  background: var(--color-navy);
-}
-
 .hero-media-sound {
   position: absolute;
-  right: var(--space-4);
-  top: var(--space-4);
+  z-index: 1;
+  right: var(--side-padding);
+  bottom: var(--space-5);
   width: 44px;
   height: 44px;
   border-radius: 50%;

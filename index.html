@@ -96,7 +96,22 @@
 
 <!-- ================= HERO ================= -->
 <section class="hero" id="topo">
-  <div class="container hero-grid">
+  <div class="hero-video-bg">
+    <video
+      id="hero-video"
+      poster="assets/img/gallery/ambiente-01-piscina.jpg"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="auto"
+      aria-label="Vídeo institucional Hidrolar Banhos">
+      <source src="assets/video/intro.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+  </div>
+
+  <div class="container hero-content-wrap">
     <div class="hero-content">
       <p class="eyebrow reveal">Hidrolar Banhos</p>
       <h1 class="hero-title reveal">Transforme seu espaço em uma experiência de bem-estar.</h1>
@@ -107,7 +122,7 @@
           Conhecer nossas saunas
           <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
         </a>
-        <a href="#" class="btn btn-outline" data-whatsapp>Solicitar orçamento</a>
+        <a href="#" class="btn btn-outline-light" data-whatsapp>Solicitar orçamento</a>
       </div>
 
       <ul class="trust-row reveal">
@@ -125,26 +140,14 @@
         </li>
       </ul>
     </div>
-
-    <div class="hero-media reveal">
-      <video
-        id="hero-video"
-        poster="assets/img/gallery/ambiente-01-piscina.jpg"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        aria-label="Vídeo institucional Hidrolar Banhos">
-        <source src="assets/video/intro.mp4" type="video/mp4">
-      </video>
-      <button type="button" class="hero-media-sound" id="hero-video-sound" aria-label="Ativar som do vídeo" aria-pressed="false">
-        <svg class="icon icon-mute" aria-hidden="true"><use href="#icon-mute"></use></svg>
-        <svg class="icon icon-volume" aria-hidden="true"><use href="#icon-volume"></use></svg>
-      </button>
-      <p class="hero-media-caption">Hidrolar Banhos — saunas e projetos premium em São Paulo</p>
-    </div>
   </div>
+
+  <p class="hero-media-caption">Hidrolar Banhos — saunas e projetos premium em São Paulo</p>
+
+  <button type="button" class="hero-media-sound" id="hero-video-sound" aria-label="Ativar som do vídeo" aria-pressed="false">
+    <svg class="icon icon-mute" aria-hidden="true"><use href="#icon-mute"></use></svg>
+    <svg class="icon icon-volume" aria-hidden="true"><use href="#icon-volume"></use></svg>
+  </button>
 </section>
 
 <!-- ================= CATÁLOGO ================= -->
