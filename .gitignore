@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+.vercel
+
+# Uploads originais já otimizados e copiados para assets/ e .claude/skills/
+/*.jpeg
+/*.jpg
+/*.png
+/*.mp4
+/SKILL.md
