@@ -8,3 +8,10 @@ Thumbs.db
 /*.png
 /*.mp4
 /SKILL.md
+
+# Download bruto do repositorio da skill ui-ux-pro-max; ja copiado para .claude/skills/
+/ui-ux-pro-max-skill-main/
+/ui-ux-pro-max-skill-main.zip
+
+__pycache__/
+*.pyc

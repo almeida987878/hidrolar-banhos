@@ -628,13 +628,13 @@ p {
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-soft);
-  transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
+  transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
   display: flex;
   flex-direction: column;
 }
 
 .product-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-6px) scale(1.01);
   box-shadow: var(--shadow-medium);
 }
 
@@ -687,6 +687,9 @@ p {
 }
 
 .product-price-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--color-navy);
@@ -694,7 +697,13 @@ p {
   margin-top: auto;
 }
 
-.product-price-tag span {
+.product-price-tag > .icon {
+  font-size: 1.3rem;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.product-price-label {
   display: block;
   font-size: 0.75rem;
   font-weight: 600;

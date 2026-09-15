@@ -119,7 +119,7 @@
       var cover = product.images[0];
       var cashLabel = money(product.pricing.cash);
       return (
-        '<article class="product-card reveal">' +
+        '<article class="product-card">' +
         '<div class="product-card-media">' +
         picture(cover.src, cover.alt, "", "(min-width: 900px) 33vw, 100vw") +
         "</div>" +
@@ -130,7 +130,10 @@
         "<span><strong>Medidas:</strong> " + product.dimensions.length + " x " + product.dimensions.width + " x " + product.dimensions.height + "</span>" +
         "<span><strong>Capacidade:</strong> " + product.capacity + "</span>" +
         "</div>" +
-        '<p class="product-price-tag"><span>A partir de</span>' + cashLabel + "</p>" +
+        '<p class="product-price-tag">' +
+        '<svg class="icon" aria-hidden="true"><use href="#icon-tag"></use></svg>' +
+        '<span><span class="product-price-label">A partir de</span>' + cashLabel + "</span>" +
+        "</p>" +
         '<div class="product-card-actions">' +
         '<a class="btn btn-outline" href="#' + product.slug + '">Ver detalhes</a>' +
         '<a class="btn btn-accent" href="#" data-whatsapp data-whatsapp-message="Olá! Tenho interesse na ' + product.name + ' e gostaria de solicitar um orçamento.">Solicitar orçamento</a>' +
@@ -148,27 +151,45 @@
       el.setAttribute("rel", "noopener");
     });
 
-    // observa novos reveals
-    if ("IntersectionObserver" in window) {
-      var io2 = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add("is-visible");
-              io2.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.1 }
-      );
-      catalogGrid.querySelectorAll(".reveal").forEach(function (el) {
-        io2.observe(el);
-      });
-    } else {
-      catalogGrid.querySelectorAll(".reveal").forEach(function (el) {
-        el.classList.add("is-visible");
-      });
+    revealCatalogGrid();
+  }
+
+  /* Entrada em onda dos cards do catálogo (GSAP, grid-aware, spring easing).
+     Cai para o estado final direto sem animação com reduced-motion ou sem GSAP. */
+  function revealCatalogGrid() {
+    var cards = catalogGrid.querySelectorAll(".product-card");
+    if (!cards.length) return;
+
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var hasGsap = typeof gsap !== "undefined";
+
+    if (!hasGsap || reduceMotion) {
+      return;
     }
+
+    gsap.set(cards, { opacity: 0, y: 16, scale: 0.92 });
+
+    var played = false;
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && !played) {
+            played = true;
+            gsap.to(cards, {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.4,
+              ease: "back.out(1.4)",
+              stagger: { each: 0.06, from: "start", grid: "auto" }
+            });
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(catalogGrid);
   }
 
   /* ---------------------------------------------------------
