@@ -1081,6 +1081,20 @@ p {
   margin-bottom: var(--space-4);
 }
 
+.about-text-center {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.about-text-center .brand-contact-list {
+  align-items: center;
+}
+
+.about-text-center .brand-contact-item {
+  justify-content: center;
+}
+
 .about-media {
   border-radius: var(--radius-lg);
   overflow: hidden;

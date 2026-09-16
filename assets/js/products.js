@@ -59,6 +59,7 @@ const FEATURES = [
 /* Seção 07 — Ciência, calor & bem-estar */
 const WELLBEING_TOPICS = [
   { icon: "flame", label: "Saúde cardiovascular" },
+  { icon: "bolt", label: "Artérias saudáveis" },
   { icon: "sliders", label: "Recuperação muscular" },
   { icon: "sparkle", label: "Relaxamento" },
   { icon: "shield", label: "Qualidade do sono" },
