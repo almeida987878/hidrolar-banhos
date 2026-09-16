@@ -569,11 +569,40 @@
         playPromise.catch(function () {});
       }
     };
-    if (video.readyState >= 2) {
-      tryPlay();
+    var arm = function () {
+      if (video.readyState >= 2) {
+        tryPlay();
+      } else {
+        video.addEventListener("loadedmetadata", tryPlay, { once: true });
+      }
+    };
+
+    if (video.preload === "none") {
+      /* Vídeos abaixo da dobra só começam a carregar perto da
+         viewport, para não disputar banda com o vídeo do hero. */
+      if ("IntersectionObserver" in window) {
+        var lazyObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                video.preload = "auto";
+                video.load();
+                arm();
+                lazyObserver.unobserve(video);
+              }
+            });
+          },
+          { rootMargin: "600px 0px" }
+        );
+        lazyObserver.observe(video);
+      } else {
+        video.preload = "auto";
+        arm();
+      }
     } else {
-      video.addEventListener("loadedmetadata", tryPlay, { once: true });
+      arm();
     }
+
     document.addEventListener("visibilitychange", function () {
       if (!document.hidden) tryPlay();
     });
