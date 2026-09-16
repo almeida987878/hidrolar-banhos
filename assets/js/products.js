@@ -80,7 +80,6 @@ const GALLERY = [
   { src: "assets/img/gallery/ambiente-03-cedro", alt: "Detalhe da madeira de cedro em projeto Hidrolar Banhos", label: "Madeira" },
   { src: "assets/img/product/monaco-01", alt: "Estrutura em vidro temperado da Sauna Mônaco", label: "Vidro" },
   { src: "assets/img/product/monaco-03", alt: "Painel digital e acabamento da Sauna Mônaco", label: "Painel digital" },
-  { src: "assets/img/experience/experience-sauna-vapor", alt: "Vapor em ambiente de sauna Hidrolar", label: "Vapor" },
   { src: "assets/img/product/monaco-02", alt: "Bancos internos da Sauna Mônaco", label: "Bancos" },
   { src: "assets/img/product/monaco-04", alt: "Acabamento da Sauna Mônaco em funcionamento", label: "Acabamento" },
   { src: "assets/img/experience/hero-sauna-noturna", alt: "Iluminação indireta de projeto Hidrolar ao entardecer", label: "Iluminação" },
