@@ -372,11 +372,13 @@
     var startX = 0;
     var startScroll = 0;
     var moved = false;
+    var downTarget = null;
 
     track.addEventListener("pointerdown", function (e) {
       if (e.pointerType === "touch") return;
       isDown = true;
       moved = false;
+      downTarget = e.target;
       track.dataset.dragged = "false";
       startX = e.clientX;
       startScroll = track.scrollLeft;
@@ -400,6 +402,15 @@
       track.classList.remove("is-dragging");
       if (moved) {
         scrollToIndex(currentIndex());
+      } else if (config.onSlideClick && downTarget && downTarget.closest) {
+        // setPointerCapture on the track can suppress the native "click"
+        // event for real mouse input, so trigger the slide action here
+        // whenever the pointer didn't actually drag.
+        var slideEl = downTarget.closest(".carousel-slide, .product-card");
+        if (slideEl) {
+          var idx = slides.indexOf(slideEl);
+          if (idx > -1) config.onSlideClick(slideEl, idx);
+        }
       }
       setTimeout(function () {
         track.dataset.dragged = "false";
@@ -444,10 +455,15 @@
     if (!track) return;
 
     track.innerHTML = GALLERY
-      .map(function (img, i) {
+      .map(function (item, i) {
+        var isVideo = item.type === "video";
+        var media = isVideo
+          ? picture(item.poster, item.alt, "", "(min-width: 1200px) 360px, (min-width: 768px) 34vw, 72vw") +
+            '<span class="carousel-play-badge"><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg></span>'
+          : picture(item.src, item.alt, "", "(min-width: 1200px) 360px, (min-width: 768px) 34vw, 72vw");
         return (
-          '<figure class="carousel-slide" data-gallery-index="' + i + '">' +
-          picture(img.src, img.alt, "", "(min-width: 1200px) 360px, (min-width: 768px) 34vw, 72vw") +
+          '<figure class="carousel-slide' + (isVideo ? " is-video" : "") + '" data-gallery-index="' + i + '">' +
+          media +
           "</figure>"
         );
       })
@@ -466,7 +482,10 @@
       prevBtn: document.getElementById("gallery-prev"),
       nextBtn: document.getElementById("gallery-next"),
       dotsWrap: document.getElementById("gallery-dots"),
-      dotLabel: function (i) { return "Ir para a imagem " + (i + 1); }
+      dotLabel: function (i) { return "Ir para a imagem " + (i + 1); },
+      onSlideClick: function (slideEl, idx) {
+        openLightbox(GALLERY, idx);
+      }
     });
   }
 
@@ -475,6 +494,7 @@
   --------------------------------------------------------- */
   var lightbox = document.getElementById("lightbox");
   var lightboxImg = lightbox ? lightbox.querySelector("img") : null;
+  var lightboxVideo = lightbox ? lightbox.querySelector("video") : null;
   var lightboxSet = [];
   var lightboxIndex = 0;
 
@@ -482,32 +502,50 @@
     if (!lightbox || !lightboxImg) return;
     lightboxSet = images;
     lightboxIndex = index;
-    updateLightboxImage();
+    updateLightboxMedia();
     lightbox.classList.add("is-open");
     document.body.style.overflow = "hidden";
   }
 
-  function updateLightboxImage() {
-    var img = lightboxSet[lightboxIndex];
-    lightboxImg.src = img.src + ".jpg";
-    lightboxImg.alt = img.alt;
+  function updateLightboxMedia() {
+    var item = lightboxSet[lightboxIndex];
+    if (lightboxVideo) {
+      lightboxVideo.pause();
+      lightboxVideo.removeAttribute("src");
+      lightboxVideo.load();
+    }
+    if (item.type === "video") {
+      lightboxImg.hidden = true;
+      if (lightboxVideo) {
+        lightboxVideo.hidden = false;
+        lightboxVideo.src = item.src;
+        lightboxVideo.poster = item.poster + ".jpg";
+        lightboxVideo.play().catch(function () {});
+      }
+    } else {
+      if (lightboxVideo) lightboxVideo.hidden = true;
+      lightboxImg.hidden = false;
+      lightboxImg.src = item.src + ".jpg";
+      lightboxImg.alt = item.alt;
+    }
   }
 
   function closeLightbox() {
     if (!lightbox) return;
     lightbox.classList.remove("is-open");
     document.body.style.overflow = "";
+    if (lightboxVideo) lightboxVideo.pause();
   }
 
   if (lightbox) {
     lightbox.querySelector(".lightbox-close").addEventListener("click", closeLightbox);
     lightbox.querySelector(".lightbox-prev").addEventListener("click", function () {
       lightboxIndex = (lightboxIndex - 1 + lightboxSet.length) % lightboxSet.length;
-      updateLightboxImage();
+      updateLightboxMedia();
     });
     lightbox.querySelector(".lightbox-next").addEventListener("click", function () {
       lightboxIndex = (lightboxIndex + 1) % lightboxSet.length;
-      updateLightboxImage();
+      updateLightboxMedia();
     });
     lightbox.addEventListener("click", function (e) {
       if (e.target === lightbox) closeLightbox();

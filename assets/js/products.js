@@ -83,5 +83,13 @@ const GALLERY = [
   { src: "assets/img/product/monaco-02", alt: "Bancos internos da Sauna Mônaco", label: "Bancos" },
   { src: "assets/img/product/monaco-04", alt: "Acabamento da Sauna Mônaco em funcionamento", label: "Acabamento" },
   { src: "assets/img/experience/hero-sauna-noturna", alt: "Iluminação indireta de projeto Hidrolar ao entardecer", label: "Iluminação" },
-  { src: "assets/img/experience/architecture-sauna-rooftop", alt: "Ambiente completo de projeto Hidrolar em rooftop", label: "Ambiente completo" }
+  { src: "assets/img/experience/architecture-sauna-rooftop", alt: "Ambiente completo de projeto Hidrolar em rooftop", label: "Ambiente completo" },
+  { src: "assets/img/experience/lifestyle-spa-lounge", alt: "Ambiente de relaxamento Hidrolar ao entardecer", label: "Ambiente" },
+  {
+    type: "video",
+    src: "assets/video/tour-instalacao.mp4",
+    poster: "assets/img/experience/tour-poster",
+    alt: "Tour em vídeo de um projeto Hidrolar instalado",
+    label: "Vídeo do projeto"
+  }
 ];
