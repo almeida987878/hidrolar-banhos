@@ -1742,6 +1742,21 @@ p {
   text-align: center;
 }
 
+.wellbeing-feature-media {
+  max-width: 720px;
+  margin: var(--space-8) auto;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  box-shadow: var(--shadow-soft);
+}
+
+.wellbeing-feature-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* =========================================================
    SEÇÃO 08 — GARANTIA
    ========================================================= */
