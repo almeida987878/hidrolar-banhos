@@ -530,6 +530,7 @@ p {
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  background-color: var(--color-navy);
 }
 
 .hero-media-bg video {
@@ -1583,6 +1584,7 @@ p {
   position: absolute;
   inset: 0;
   z-index: 0;
+  background-color: var(--color-navy);
 }
 
 .experience-media img {
