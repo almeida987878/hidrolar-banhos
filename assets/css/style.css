@@ -1716,6 +1716,25 @@ p {
   }
 }
 
+.wellbeing-center {
+  max-width: 640px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.wellbeing-center .section-subtitle {
+  margin-inline: auto;
+}
+
+.wellbeing-center .wellbeing-list {
+  align-items: center;
+}
+
+.wellbeing-center .wellbeing-disclaimer {
+  margin-inline: auto;
+  text-align: center;
+}
+
 /* =========================================================
    SEÇÃO 08 — GARANTIA
    ========================================================= */
