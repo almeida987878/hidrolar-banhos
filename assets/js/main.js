@@ -559,27 +559,28 @@
   }
 
   /* ---------------------------------------------------------
-     Vídeo do Hero — autoplay mudo em mobile e desktop + botão de som
+     Vídeos de fundo (Hero + demais seções) — autoplay mudo em
+     mobile e desktop, com fallback via loadedmetadata/visibilitychange
   --------------------------------------------------------- */
-  var heroVideo = document.getElementById("hero-video");
-  var heroSoundBtn = document.getElementById("hero-video-sound");
-
-  if (heroVideo) {
+  document.querySelectorAll(".js-autoplay-video").forEach(function (video) {
     var tryPlay = function () {
-      var playPromise = heroVideo.play();
+      var playPromise = video.play();
       if (playPromise && playPromise.catch) {
         playPromise.catch(function () {});
       }
     };
-    if (heroVideo.readyState >= 2) {
+    if (video.readyState >= 2) {
       tryPlay();
     } else {
-      heroVideo.addEventListener("loadedmetadata", tryPlay, { once: true });
+      video.addEventListener("loadedmetadata", tryPlay, { once: true });
     }
     document.addEventListener("visibilitychange", function () {
       if (!document.hidden) tryPlay();
     });
-  }
+  });
+
+  var heroVideo = document.getElementById("hero-video");
+  var heroSoundBtn = document.getElementById("hero-video-sound");
 
   if (heroSoundBtn && heroVideo) {
     heroSoundBtn.addEventListener("click", function () {
