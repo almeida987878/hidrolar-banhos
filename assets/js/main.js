@@ -1,14 +1,6 @@
 (function () {
   "use strict";
 
-  var money = function (value) {
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      maximumFractionDigits: 0
-    });
-  };
-
   var picture = function (basePath, alt, className, sizes) {
     return (
       '<picture>' +
@@ -37,7 +29,7 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* Esconde o WhatsApp flutuante enquanto o Hero (com CTAs próprios) está visível */
+  /* Esconde o WhatsApp flutuante enquanto o Hero está visível */
   var whatsappFloat = document.querySelector(".whatsapp-float");
   var heroSection = document.getElementById("topo");
   if (whatsappFloat && heroSection && "IntersectionObserver" in window) {
@@ -69,137 +61,103 @@
   });
 
   /* ---------------------------------------------------------
-     Reveal on scroll
+     Reveal on scroll (observa também elementos injetados depois)
   --------------------------------------------------------- */
-  var revealEls = document.querySelectorAll(".reveal");
+  var revealIO = null;
   if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(
+    revealIO = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
             entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
+            revealIO.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
     );
-    revealEls.forEach(function (el) {
-      io.observe(el);
-    });
-  } else {
-    revealEls.forEach(function (el) {
-      el.classList.add("is-visible");
+  }
+
+  function observeReveal(root) {
+    var scope = root || document;
+    var els = scope.querySelectorAll(".reveal:not([data-observed])");
+    els.forEach(function (el) {
+      el.setAttribute("data-observed", "true");
+      if (revealIO) {
+        revealIO.observe(el);
+      } else {
+        el.classList.add("is-visible");
+      }
     });
   }
 
   /* ---------------------------------------------------------
-     WhatsApp links dinâmicos
+     Links dinâmicos (WhatsApp, Instagram, site)
   --------------------------------------------------------- */
-  document.querySelectorAll("[data-whatsapp]").forEach(function (el) {
-    var customMessage = el.getAttribute("data-whatsapp-message");
-    el.setAttribute("href", buildWhatsAppLink(customMessage));
-    el.setAttribute("target", "_blank");
-    el.setAttribute("rel", "noopener");
-  });
+  function bindDynamicLinks(root) {
+    var scope = root || document;
 
-  document.querySelectorAll("[data-instagram]").forEach(function (el) {
-    el.setAttribute("href", SITE_CONFIG.instagramUrl);
-    el.setAttribute("target", "_blank");
-    el.setAttribute("rel", "noopener");
-  });
-
-  document.querySelectorAll("[data-maps-address]").forEach(function (el) {
-    var address = SITE_CONFIG.address.line1 + ", " + SITE_CONFIG.address.line2;
-    el.setAttribute("href", buildMapsLink(address));
-    el.setAttribute("target", "_blank");
-    el.setAttribute("rel", "noopener");
-  });
-
-  document.querySelectorAll("[data-address-line1]").forEach(function (el) {
-    el.textContent = SITE_CONFIG.address.line1;
-  });
-  document.querySelectorAll("[data-address-line2]").forEach(function (el) {
-    el.textContent = SITE_CONFIG.address.line2;
-  });
-
-  /* ---------------------------------------------------------
-     Catálogo — carrossel de cards a partir de PRODUCTS
-  --------------------------------------------------------- */
-  function renderCatalog() {
-    var track = document.getElementById("catalog-track");
-    if (!track) return;
-
-    track.innerHTML = PRODUCTS.map(function (product) {
-      var cover = product.images[0];
-      var cashLabel = money(product.pricing.cash);
-      return (
-        '<article class="product-card">' +
-        '<div class="product-card-media">' +
-        picture(cover.src, cover.alt, "", "(min-width: 900px) 33vw, 100vw") +
-        "</div>" +
-        '<div class="product-card-body">' +
-        "<h3>" + product.name + "</h3>" +
-        '<p class="product-card-desc">' + product.shortDescription + "</p>" +
-        '<div class="product-meta">' +
-        "<span><strong>Medidas:</strong> " + product.dimensions.length + " x " + product.dimensions.width + " x " + product.dimensions.height + "</span>" +
-        "<span><strong>Capacidade:</strong> " + product.capacity + "</span>" +
-        "</div>" +
-        '<p class="product-price-tag">' +
-        '<svg class="icon" aria-hidden="true"><use href="#icon-tag"></use></svg>' +
-        '<span><span class="product-price-label">A partir de</span>' + cashLabel + "</span>" +
-        "</p>" +
-        '<div class="product-card-actions">' +
-        '<a class="btn btn-outline" href="#' + product.slug + '">Ver detalhes</a>' +
-        '<a class="btn btn-accent" href="#" data-whatsapp data-whatsapp-message="Olá! Tenho interesse na ' + product.name + ' e gostaria de solicitar um orçamento.">Solicitar orçamento</a>' +
-        "</div>" +
-        "</div>" +
-        "</article>"
-      );
-    }).join("");
-
-    // reativa whatsapp links recém-criados
-    track.querySelectorAll("[data-whatsapp]").forEach(function (el) {
+    scope.querySelectorAll("[data-whatsapp]").forEach(function (el) {
       var customMessage = el.getAttribute("data-whatsapp-message");
       el.setAttribute("href", buildWhatsAppLink(customMessage));
       el.setAttribute("target", "_blank");
       el.setAttribute("rel", "noopener");
     });
 
-    initCarousel({
-      track: track,
-      prevBtn: document.getElementById("catalog-prev"),
-      nextBtn: document.getElementById("catalog-next"),
-      dotsWrap: document.getElementById("catalog-dots"),
-      dotLabel: function (i) { return "Ir para o projeto " + (i + 1); }
+    scope.querySelectorAll("[data-whatsapp-display]").forEach(function (el) {
+      var formatted = SITE_CONFIG.whatsappNumber.replace(/^55/, "");
+      var ddd = formatted.slice(0, 2);
+      var rest = formatted.slice(2);
+      var num = rest.length === 9 ? rest.slice(0, 5) + "-" + rest.slice(5) : rest.slice(0, 4) + "-" + rest.slice(4);
+      el.textContent = "(" + ddd + ") " + num;
+    });
+
+    scope.querySelectorAll("[data-instagram]").forEach(function (el) {
+      el.setAttribute("href", SITE_CONFIG.instagramUrl);
+      el.setAttribute("target", "_blank");
+      el.setAttribute("rel", "noopener");
+    });
+
+    scope.querySelectorAll("[data-site-url]").forEach(function (el) {
+      if (el.hasAttribute("data-site-link")) {
+        el.setAttribute("href", "https://" + SITE_CONFIG.siteUrl);
+        el.setAttribute("target", "_blank");
+        el.setAttribute("rel", "noopener");
+      }
+      el.textContent = SITE_CONFIG.siteUrl;
     });
   }
 
+  document.querySelectorAll("[data-whatsapp-product]").forEach(function (el) {
+    el.setAttribute(
+      "data-whatsapp-message",
+      "Olá! Tenho interesse na " + PRODUCT.name + " e gostaria de solicitar um projeto."
+    );
+  });
+
+  bindDynamicLinks(document);
+
   /* ---------------------------------------------------------
-     Detalhe do produto principal
+     Seção 02 — Apresentação do produto
   --------------------------------------------------------- */
   var galleryState = { images: [], index: 0 };
 
-  function renderProductDetail() {
-    var product = PRODUCTS[0];
-    if (!product) return;
-
-    var root = document.getElementById(product.slug);
+  function renderProductIntro() {
+    var root = document.getElementById(PRODUCT.slug) || document.getElementById("projeto");
     if (!root) return;
 
     root.querySelectorAll("[data-pd-name]").forEach(function (el) {
-      el.textContent = product.name;
+      el.textContent = PRODUCT.name;
     });
     root.querySelectorAll("[data-pd-tagline]").forEach(function (el) {
-      el.textContent = product.tagline;
+      el.textContent = PRODUCT.tagline;
     });
 
-    // Galeria principal
     var mainWrap = root.querySelector("[data-pd-main]");
     var thumbsWrap = root.querySelector("[data-pd-thumbs]");
     if (mainWrap && thumbsWrap) {
-      mainWrap.innerHTML = picture(product.images[0].src, product.images[0].alt, "", "(min-width: 1024px) 50vw, 100vw");
-      thumbsWrap.innerHTML = product.images
+      mainWrap.innerHTML = picture(PRODUCT.images[0].src, PRODUCT.images[0].alt, "", "(min-width: 1024px) 50vw, 100vw");
+      thumbsWrap.innerHTML = PRODUCT.images
         .map(function (img, i) {
           return (
             '<button type="button" class="pd-thumb' + (i === 0 ? " is-active" : "") + '" data-thumb-index="' + i + '" aria-label="Ver imagem ' + (i + 1) + '">' +
@@ -209,7 +167,7 @@
         })
         .join("");
 
-      galleryState.images = product.images;
+      galleryState.images = PRODUCT.images;
       galleryState.index = 0;
 
       thumbsWrap.querySelectorAll(".pd-thumb").forEach(function (btn) {
@@ -220,32 +178,31 @@
       });
 
       mainWrap.addEventListener("click", function () {
-        openLightbox(product.images, galleryState.index);
+        openLightbox(PRODUCT.images, galleryState.index);
       });
     }
 
     function setActiveImage(idx) {
       galleryState.index = idx;
-      var img = product.images[idx];
+      var img = PRODUCT.images[idx];
       mainWrap.innerHTML = picture(img.src, img.alt);
       mainWrap.addEventListener("click", function () {
-        openLightbox(product.images, galleryState.index);
+        openLightbox(PRODUCT.images, galleryState.index);
       });
       thumbsWrap.querySelectorAll(".pd-thumb").forEach(function (btn, i) {
         btn.classList.toggle("is-active", i === idx);
       });
     }
 
-    // Specs
     var specGrid = root.querySelector("[data-pd-specs]");
     if (specGrid) {
       var specs = [
-        { icon: "ruler", label: "Medidas", value: product.dimensions.length + " x " + product.dimensions.width + " x " + product.dimensions.height },
-        { icon: "users", label: "Capacidade", value: product.capacity },
-        { icon: "flame", label: "Gerador", value: product.generator.power + " — " + product.generator.brand },
-        { icon: "glass", label: "Vidro", value: product.glass },
-        { icon: "sliders", label: "Controle", value: product.panel },
-        { icon: "shield", label: "Garantia", value: product.warranty }
+        { icon: "ruler", label: "Medidas", value: PRODUCT.dimensions.length + " x " + PRODUCT.dimensions.width + " x " + PRODUCT.dimensions.height },
+        { icon: "users", label: "Capacidade", value: PRODUCT.capacity },
+        { icon: "flame", label: "Gerador", value: PRODUCT.generator.power + " — " + PRODUCT.generator.brand },
+        { icon: "glass", label: "Vidro", value: PRODUCT.glass },
+        { icon: "sliders", label: "Controle", value: PRODUCT.panel },
+        { icon: "shield", label: "Garantia", value: PRODUCT.warranty }
       ];
       specGrid.innerHTML = specs
         .map(function (s) {
@@ -260,97 +217,79 @@
         .join("");
     }
 
-    // Estrutura
-    var structureList = root.querySelector("[data-pd-structure]");
-    if (structureList) {
-      structureList.innerHTML = product.structure
-        .map(function (item) {
-          return (
-            "<li>" +
-            '<svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg>' +
-            "<span>" + item + "</span>" +
-            "</li>"
-          );
-        })
-        .join("");
-    }
-
-    // Requisitos elétricos
-    root.querySelectorAll("[data-pd-wiring]").forEach(function (el) {
-      el.textContent = product.electrical.wiring;
-    });
-    root.querySelectorAll("[data-pd-breaker]").forEach(function (el) {
-      el.textContent = product.electrical.breaker;
-    });
-
-    // Diferenciais
-    var diffGrid = document.getElementById("diferenciais-grid");
-    if (diffGrid) {
-      var diffIcons = ["sparkle", "glass", "wood", "sliders", "flame", "bolt", "shield", "shield"];
-      diffGrid.innerHTML = product.differentials
-        .map(function (item, i) {
-          return (
-            '<div class="diff-card reveal">' +
-            '<span class="diff-icon"><svg class="icon" aria-hidden="true"><use href="#icon-' + (diffIcons[i] || "check") + '"></use></svg></span>' +
-            "<p>" + item + "</p>" +
-            "</div>"
-          );
-        })
-        .join("");
-      if ("IntersectionObserver" in window) {
-        var io3 = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add("is-visible");
-                io3.unobserve(entry.target);
-              }
-            });
-          },
-          { threshold: 0.1 }
-        );
-        diffGrid.querySelectorAll(".reveal").forEach(function (el) {
-          io3.observe(el);
-        });
-      } else {
-        diffGrid.querySelectorAll(".reveal").forEach(function (el) {
-          el.classList.add("is-visible");
-        });
-      }
-    }
-
-    // Preço
-    root.querySelectorAll("[data-pd-cash]").forEach(function (el) {
-      el.textContent = money(product.pricing.cash);
-    });
-    root.querySelectorAll("[data-pd-installment-total]").forEach(function (el) {
-      el.textContent = money(product.pricing.installmentTotal);
-    });
-    root.querySelectorAll("[data-pd-installments]").forEach(function (el) {
-      el.textContent = product.pricing.installments;
-    });
-    root.querySelectorAll("[data-whatsapp-product]").forEach(function (el) {
-      el.setAttribute(
-        "data-whatsapp-message",
-        "Olá! Tenho interesse na " + product.name + " e gostaria de solicitar um orçamento."
-      );
-    });
+    document.querySelectorAll("[data-pd-dim-length]").forEach(function (el) { el.textContent = PRODUCT.dimensions.length; });
+    document.querySelectorAll("[data-pd-dim-width]").forEach(function (el) { el.textContent = PRODUCT.dimensions.width; });
+    document.querySelectorAll("[data-pd-dim-height]").forEach(function (el) { el.textContent = PRODUCT.dimensions.height; });
+    document.querySelectorAll("[data-pd-generator-power]").forEach(function (el) { el.textContent = PRODUCT.generator.power; });
+    document.querySelectorAll("[data-pd-generator-brand]").forEach(function (el) { el.textContent = PRODUCT.generator.brand; });
+    document.querySelectorAll("[data-pd-wiring]").forEach(function (el) { el.textContent = PRODUCT.electrical.wiring; });
+    document.querySelectorAll("[data-pd-breaker]").forEach(function (el) { el.textContent = PRODUCT.electrical.breaker; });
+    document.querySelectorAll("[data-pd-warranty]").forEach(function (el) { el.textContent = PRODUCT.warranty.toUpperCase(); });
   }
 
   /* ---------------------------------------------------------
-     Galeria de ambientes (carrossel interativo)
+     Seção 03 — Detalhes (lista editorial alternada)
   --------------------------------------------------------- */
-  var siteGallery = [
-    { src: "assets/img/gallery/ambiente-01-piscina", alt: "Sauna e área de lazer com piscina integrada, projeto Hidrolar Banhos" },
-    { src: "assets/img/gallery/ambiente-02-madeira", alt: "Estrutura de sauna com acabamento em madeira e vidro sob medida" },
-    { src: "assets/img/gallery/ambiente-03-cedro", alt: "Cabine de sauna em madeira de cedro integrada ao paisagismo" },
-    { src: "assets/img/product/monaco-02", alt: "Sauna a Vapor Dupla Mônaco vista lateral" },
-    { src: "assets/img/product/monaco-04", alt: "Sauna a Vapor Dupla Mônaco em funcionamento" },
-    { src: "assets/img/product/monaco-05", alt: "Sauna a Vapor Dupla Mônaco instalada em área externa" }
-  ];
+  function renderFeatures() {
+    var list = document.getElementById("feature-list");
+    if (!list) return;
 
-  /* Carrossel genérico: arraste com mouse, swipe nativo no touch,
-     setas, dots e teclado. Usado pelo catálogo e pela galeria. */
+    list.innerHTML = FEATURES.map(function (f, i) {
+      return (
+        '<article class="feature-row reveal' + (i % 2 === 1 ? " reverse" : "") + '">' +
+        '<div class="feature-row-media">' + picture(f.image.src, f.image.alt, "", "(min-width: 860px) 50vw, 100vw") + "</div>" +
+        '<div class="feature-row-body">' +
+        '<span class="feature-row-number">' + f.number + "</span>" +
+        "<h3>" + f.title + "</h3>" +
+        "<p>" + f.text + "</p>" +
+        "</div>" +
+        "</article>"
+      );
+    }).join("");
+
+    observeReveal(list);
+  }
+
+  /* ---------------------------------------------------------
+     Seção 07 — Ciência, calor & bem-estar
+  --------------------------------------------------------- */
+  function renderWellbeing() {
+    var list = document.getElementById("wellbeing-list");
+    if (!list) return;
+
+    list.innerHTML = WELLBEING_TOPICS.map(function (t) {
+      return (
+        '<li class="wellbeing-item">' +
+        '<svg class="icon" aria-hidden="true"><use href="#icon-' + t.icon + '"></use></svg>' +
+        "<span>" + t.label + "</span>" +
+        "</li>"
+      );
+    }).join("");
+  }
+
+  /* ---------------------------------------------------------
+     Seção 09 — Processo
+  --------------------------------------------------------- */
+  function renderTimeline() {
+    var grid = document.getElementById("timeline-grid");
+    if (!grid) return;
+
+    grid.innerHTML = TIMELINE.map(function (step) {
+      return (
+        '<div class="step-item reveal">' +
+        '<span class="step-number">' + step.number + "</span>" +
+        "<h3>" + step.title + "</h3>" +
+        "<p>" + step.text + "</p>" +
+        "</div>"
+      );
+    }).join("");
+
+    observeReveal(grid);
+  }
+
+  /* ---------------------------------------------------------
+     Carrossel genérico
+  --------------------------------------------------------- */
   function initCarousel(config) {
     var track = config.track;
     var prevBtn = config.prevBtn;
@@ -429,7 +368,6 @@
       });
     }
 
-    // Arraste com mouse (touch já rola nativamente)
     var isDown = false;
     var startX = 0;
     var startScroll = 0;
@@ -471,7 +409,6 @@
     track.addEventListener("pointerleave", endDrag);
     track.addEventListener("pointercancel", endDrag);
 
-    // Teclado (quando o track está focado)
     track.addEventListener("keydown", function (e) {
       if (e.key === "ArrowRight") {
         e.preventDefault();
@@ -499,11 +436,14 @@
     requestAnimationFrame(updateActiveState);
   }
 
+  /* ---------------------------------------------------------
+     Seção 10 — Galeria
+  --------------------------------------------------------- */
   function renderGallery() {
     var track = document.getElementById("gallery-track");
     if (!track) return;
 
-    track.innerHTML = siteGallery
+    track.innerHTML = GALLERY
       .map(function (img, i) {
         return (
           '<figure class="carousel-slide" data-gallery-index="' + i + '">' +
@@ -517,7 +457,7 @@
       fig.addEventListener("click", function () {
         if (track.dataset.dragged === "true") return;
         var idx = parseInt(fig.getAttribute("data-gallery-index"), 10);
-        openLightbox(siteGallery, idx);
+        openLightbox(GALLERY, idx);
       });
     });
 
@@ -526,7 +466,7 @@
       prevBtn: document.getElementById("gallery-prev"),
       nextBtn: document.getElementById("gallery-next"),
       dotsWrap: document.getElementById("gallery-dots"),
-      dotLabel: function (i) { return "Ir para o ambiente " + (i + 1); }
+      dotLabel: function (i) { return "Ir para a imagem " + (i + 1); }
     });
   }
 
@@ -581,19 +521,26 @@
   }
 
   /* ---------------------------------------------------------
-     Vídeo do Hero — autoplay mudo (respeita reduced-motion) + botão de som
+     Vídeo do Hero — autoplay mudo em mobile e desktop + botão de som
   --------------------------------------------------------- */
   var heroVideo = document.getElementById("hero-video");
   var heroSoundBtn = document.getElementById("hero-video-sound");
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (heroVideo) {
-    if (reduceMotion) {
-      heroVideo.removeAttribute("autoplay");
-      heroVideo.pause();
+    var tryPlay = function () {
+      var playPromise = heroVideo.play();
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(function () {});
+      }
+    };
+    if (heroVideo.readyState >= 2) {
+      tryPlay();
     } else {
-      heroVideo.play().catch(function () {});
+      heroVideo.addEventListener("loadedmetadata", tryPlay, { once: true });
     }
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) tryPlay();
+    });
   }
 
   if (heroSoundBtn && heroVideo) {
@@ -613,7 +560,11 @@
   });
 
   /* Init */
-  renderCatalog();
-  renderProductDetail();
+  observeReveal(document);
+  renderProductIntro();
+  renderFeatures();
+  renderWellbeing();
+  renderTimeline();
   renderGallery();
+  bindDynamicLinks(document);
 })();

@@ -525,17 +525,37 @@ p {
   }
 }
 
-.hero-video-bg {
+.hero-media-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
 }
 
-.hero-video-bg video {
+.hero-media-bg video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.16) translate3d(-1%, -1%, 0);
+  }
+}
+
+.ken-burns {
+  animation: ken-burns 22s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns {
+    animation: none;
+  }
 }
 
 .hero-overlay {
@@ -625,133 +645,6 @@ p {
   .hero-media-caption {
     display: none;
   }
-}
-
-/* =========================================================
-   CATALOG / PRODUCT CARDS
-   ========================================================= */
-
-.catalog-track {
-  align-items: stretch;
-}
-
-.catalog-track .product-card {
-  flex: 0 0 auto;
-  width: min(360px, 82vw);
-  scroll-snap-align: start;
-}
-
-@media (min-width: 768px) {
-  .catalog-track .product-card {
-    width: min(400px, 42vw);
-  }
-}
-
-@media (min-width: 1200px) {
-  .catalog-track .product-card {
-    width: 420px;
-  }
-}
-
-.product-card {
-  background: var(--color-white);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-soft);
-  transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
-  display: flex;
-  flex-direction: column;
-}
-
-.product-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: var(--shadow-medium);
-}
-
-.product-card-media {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-}
-
-.product-card-media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--dur-slow) var(--ease);
-}
-
-.product-card:hover .product-card-media img {
-  transform: scale(1.06);
-}
-
-.product-card-body {
-  padding: var(--space-6);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  flex: 1;
-}
-
-.product-card-body h3 {
-  font-size: 1.35rem;
-}
-
-.product-card-desc {
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
-}
-
-.product-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-5);
-  margin-block: var(--space-2);
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-}
-
-.product-meta strong {
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-
-.product-price-tag {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--color-navy);
-  font-size: 1.05rem;
-  margin-top: auto;
-}
-
-.product-price-tag > .icon {
-  font-size: 1.3rem;
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-
-.product-price-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.product-card-actions {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-  flex-wrap: wrap;
-}
-
-.product-card-actions .btn {
-  flex: 1;
-  padding-inline: var(--space-4);
 }
 
 /* =========================================================
@@ -943,129 +836,7 @@ p {
 }
 
 /* =========================================================
-   DIFFERENTIALS
-   ========================================================= */
-
-.diff-grid {
-  display: grid;
-  gap: var(--space-5);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-.diff-card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease),
-    transform var(--dur-base) var(--ease);
-}
-
-.diff-card:hover {
-  border-color: rgba(41, 175, 230, 0.4);
-  box-shadow: var(--shadow-soft);
-  transform: translateY(-3px);
-}
-
-.diff-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--gradient-aqua);
-  color: var(--color-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.diff-icon .icon {
-  font-size: 1.25rem;
-}
-
-.diff-card p {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
-}
-
-/* =========================================================
-   PRICING
-   ========================================================= */
-
-.pricing-section {
-  background: var(--gradient-navy);
-  position: relative;
-  overflow: hidden;
-}
-
-.pricing-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(41, 175, 230, 0.25), transparent 55%);
-  pointer-events: none;
-}
-
-.pricing-card {
-  position: relative;
-  z-index: 1;
-  background: var(--color-white);
-  border-radius: var(--radius-lg);
-  padding: clamp(2rem, 5vw, 3.5rem);
-  max-width: 640px;
-  margin-inline: auto;
-  text-align: center;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-}
-
-.pricing-eyebrow {
-  color: var(--color-primary-dark);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: var(--space-3);
-}
-
-.pricing-card h3 {
-  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  margin-bottom: var(--space-6);
-}
-
-.price-main {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
-  color: var(--color-navy);
-  line-height: 1;
-  margin-bottom: var(--space-2);
-}
-
-.price-main small {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text-secondary);
-  margin-right: var(--space-2);
-}
-
-.price-alt {
-  color: var(--color-text-secondary);
-  font-size: 1rem;
-  margin-bottom: var(--space-7);
-}
-
-.price-alt strong {
-  color: var(--color-navy);
-}
-
-/* =========================================================
-   HOW IT WORKS
+   PROCESS TIMELINE
    ========================================================= */
 
 .steps-grid {
@@ -1305,70 +1076,6 @@ p {
   }
   .about-grid.reverse .about-media {
     order: 2;
-  }
-}
-
-/* =========================================================
-   CONTACT
-   ========================================================= */
-
-.contact-section {
-  background: var(--color-bg-soft);
-}
-
-.contact-grid {
-  display: grid;
-  gap: var(--space-8);
-  align-items: center;
-}
-
-.contact-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  margin-block: var(--space-6);
-}
-
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.contact-info-card {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-4);
-  background: var(--color-white);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
-  box-shadow: var(--shadow-soft);
-}
-
-.contact-info-card .icon {
-  font-size: 1.4rem;
-  color: var(--color-primary);
-  margin-top: 2px;
-}
-
-.contact-info-card h4 {
-  font-size: 0.95rem;
-  margin-bottom: var(--space-1);
-}
-
-.contact-info-card p,
-.contact-info-card a {
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-}
-
-.contact-info-card a:hover {
-  color: var(--color-primary-dark);
-}
-
-@media (min-width: 900px) {
-  .contact-grid {
-    grid-template-columns: 1.1fr 0.9fr;
   }
 }
 
@@ -1615,29 +1322,492 @@ p {
   display: block;
 }
 
-.video-teaser {
-  display: inline-flex;
+/* =========================================================
+   SEÇÃO 03 — DETALHES (lista editorial alternada)
+   ========================================================= */
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 8vw, 6rem);
+}
+
+.feature-row {
+  display: grid;
+  gap: var(--space-6);
   align-items: center;
-  gap: var(--space-3);
+}
+
+.feature-row-media {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  box-shadow: var(--shadow-soft);
+}
+
+.feature-row-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 900ms var(--ease);
+}
+
+.feature-row:hover .feature-row-media img {
+  transform: scale(1.04);
+}
+
+.feature-row-number {
   font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2rem;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--color-primary);
+  margin-bottom: var(--space-3);
+  display: block;
+}
+
+.feature-row-body h3 {
+  font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.65rem);
+  margin-bottom: var(--space-3);
+}
+
+.feature-row-body p {
+  color: var(--color-text-secondary);
+  max-width: 44ch;
+}
+
+@media (min-width: 860px) {
+  .feature-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .feature-row.reverse .feature-row-media {
+    order: 2;
+  }
+  .feature-row.reverse .feature-row-body {
+    order: 1;
+  }
+}
+
+/* =========================================================
+   SEÇÃO 04 — DIMENSÕES (ilustração técnica)
+   ========================================================= */
+
+.dimensions-layout {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.dimensions-stats {
+  display: flex;
+  gap: clamp(1.75rem, 5vw, 3.5rem);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-7);
+}
+
+.dimension-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dimension-stat-label {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
   font-weight: 700;
-  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.dimension-stat-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.25rem);
   color: var(--color-navy);
 }
 
-.video-teaser-play {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
+.dimension-illustration {
   background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 5vw, 3rem);
+}
+
+.dimension-illustration svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 960px) {
+  .dimensions-layout {
+    grid-template-columns: 0.95fr 1.05fr;
+  }
+}
+
+/* =========================================================
+   SEÇÃO 05 — TECNOLOGIA E INSTALAÇÃO
+   ========================================================= */
+
+.tech-layout {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.tech-media {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  box-shadow: var(--shadow-soft);
+}
+
+.tech-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tech-specs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.tech-spec-item {
+  display: flex;
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.tech-spec-item:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.tech-spec-item .icon {
+  font-size: 1.6rem;
+  color: var(--color-primary-dark);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.tech-spec-item h4 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.tech-spec-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--color-navy);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.tech-spec-item p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+@media (min-width: 960px) {
+  .tech-layout {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+}
+
+/* =========================================================
+   SEÇÃO 06 — EXPERIÊNCIA (cinematográfica full-bleed)
+   ========================================================= */
+
+.experience-section {
+  position: relative;
+  min-height: clamp(520px, 86vh, 820px);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.experience-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.experience-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.experience-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(7, 21, 50, 0.92) 0%, rgba(7, 21, 50, 0.45) 55%, rgba(7, 21, 50, 0.15) 100%);
+}
+
+.experience-content {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(3rem, 8vw, 6rem);
+  width: 100%;
+}
+
+.experience-content .eyebrow {
+  color: var(--color-primary);
+}
+
+.experience-title {
+  color: var(--color-white);
+  font-size: clamp(2rem, 1.5rem + 2.6vw, 3.75rem);
+  max-width: 18ch;
+  margin-bottom: var(--space-5);
+}
+
+.experience-text {
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 52ch;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.15rem);
+  margin-bottom: var(--space-7);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+}
+
+.tag-row li {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  padding-left: var(--space-4);
+}
+
+.tag-row li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+/* =========================================================
+   SEÇÃO 07 — CIÊNCIA, CALOR & BEM-ESTAR
+   ========================================================= */
+
+.wellbeing-layout {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.wellbeing-media {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  box-shadow: var(--shadow-soft);
+}
+
+.wellbeing-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wellbeing-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-block: var(--space-6) var(--space-7);
+}
+
+.wellbeing-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.wellbeing-item .icon {
+  font-size: 1.4rem;
+  color: var(--color-primary-dark);
+  flex-shrink: 0;
+}
+
+.wellbeing-item span {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-navy);
+}
+
+.wellbeing-disclaimer {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+  max-width: 56ch;
+}
+
+@media (min-width: 960px) {
+  .wellbeing-layout {
+    grid-template-columns: 0.85fr 1.15fr;
+  }
+}
+
+/* =========================================================
+   SEÇÃO 08 — GARANTIA
+   ========================================================= */
+
+.warranty-section {
+  text-align: center;
+}
+
+.warranty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--color-bg-soft);
   color: var(--color-primary-dark);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-soft);
-  transition: transform var(--dur-fast) var(--ease);
+  margin-inline: auto;
+  margin-bottom: var(--space-6);
 }
 
-.video-teaser:hover .video-teaser-play {
-  transform: scale(1.08);
+.warranty-icon .icon {
+  font-size: 2rem;
+}
+
+.warranty-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.25rem, 1.8rem + 1.8vw, 3.25rem);
+  color: var(--color-navy);
+  margin-bottom: var(--space-3);
+}
+
+.warranty-note {
+  color: var(--color-text-secondary);
+  max-width: 42ch;
+  margin-inline: auto;
+}
+
+/* =========================================================
+   SEÇÃO FINAL — CTA CINEMATOGRÁFICO
+   ========================================================= */
+
+.final-section {
+  position: relative;
+  min-height: clamp(480px, 78vh, 760px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.final-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.final-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.final-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 21, 50, 0.78) 0%, rgba(7, 21, 50, 0.55) 50%, rgba(7, 21, 50, 0.85) 100%);
+}
+
+.final-content {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(3rem, 8vw, 6rem);
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.final-title {
+  color: var(--color-white);
+  font-size: clamp(1.9rem, 1.4rem + 2.6vw, 3.5rem);
+  margin-bottom: var(--space-5);
+}
+
+.final-text {
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 46ch;
+  margin-inline: auto;
+  margin-bottom: var(--space-7);
+}
+
+.final-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+/* =========================================================
+   SEÇÃO 11 — INSTITUCIONAL (contato leve, sem cards)
+   ========================================================= */
+
+.brand-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.brand-contact-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: 0.95rem;
+}
+
+.brand-contact-item .icon {
+  font-size: 1.2rem;
+  color: var(--color-primary-dark);
+  flex-shrink: 0;
+}
+
+.brand-contact-item a:hover {
+  color: var(--color-primary-dark);
+}
+
+.brand-tag {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
 }

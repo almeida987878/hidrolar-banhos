@@ -2,9 +2,10 @@
 const SITE_CONFIG = {
   whatsappNumber: "551141142212",
   whatsappDefaultMessage:
-    "Olá! Vim pelo site da Hidrolar Banhos e gostaria de solicitar um orçamento.",
+    "Olá! Vim pelo site da Hidrolar Banhos e gostaria de solicitar um projeto.",
   instagramUrl:
     "https://www.instagram.com/hidrolarbanhos?stkn=MWV0eWVtMjJhMzZwNA==",
+  siteUrl: "hidrolarbanheiras.com.br",
   address: {
     line1: "Avenida Salim Farah Maluf, 2000",
     line2: "São Paulo - SP"
